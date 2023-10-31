@@ -18,7 +18,7 @@ the [collectd.conf file](src/main/resources/collectd.conf) will be used to repla
 LoadPlugin exec
 ...
 <Plugin exec>
-  Exec "boomi" "java" "-cp" "/boomi/local/cloudwatch/collectdjmx-1.0-SNAPSHOT.jar" "com.boomi.jmx.Main" "-h" "localhost" -p" "5002"
+  Exec "boomi" "java" "-cp" "/boomi/local/cloudwatch/collectdjmx-1.0.jar" "com.boomi.jmx.Main" "-h" "localhost" -p" "5002" "-d" "/boomi/local/cloudwatch/logs"
 </Plugin>
 ```
 
@@ -28,7 +28,7 @@ Update the required values. An example of the syntax is below.
 
 ```conf
 <Plugin exec>
-  Exec "<non-root-user-to-execute-java-app>" "java" "-cp" "<location-of-jar-file>" "com.boomi.jmx.Main" "-h" "<hostname>" "-p" "<jmx-port>"
+  Exec "<non-root-user-to-execute-java-app>" "java" "-cp" "<location-of-jar-file>" "com.boomi.jmx.Main" "-h" "<hostname>" "-p" "<jmx-port>" "-d" "<log-directory>"
 </Plugin>
 ```
 
@@ -40,12 +40,12 @@ sudo service collectd restart
 
 ## Commandline Arguments
 
-| Argument | Description                                                                                                                              |
-|----------|------------------------------------------------------------------------------------------------------------------------------------------|
-| -h       | Hostname of the Boomi runtime. Default is the environment variable [COLLECTD_HOSTNAME](https://collectd.org/wiki/index.php/Plugin:Exec). |
-| -p       | Port of the Boomi runtime. Default is 5002.                                                                                              |
-| -l       | Log level. Default is severe. Levels used: fine, warning, and severe                                                                     |
-| -d       | Log directory. Default is the working directory. It is recommended to set the variable.                                                  |
+| Argument | Description                                                                                                                                                           |
+|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| -h       | Hostname of the Boomi runtime. Required .                                                                                                                             |
+| -p       | Port of the Boomi runtime. Required.                                                                                                                                  |
+| -l       | Log level. Default is severe. Levels used: fine, warning, and severe                                                                                                  |
+| -d       | Log directory. Default is the current working directory. It is recommended to set the variable to ensure that the defined user has access to write to that directory. |
 
 
 ## Metrics Collected
@@ -101,6 +101,27 @@ If the runtime is running low on memory, the value will be 1. Otherwise, the val
 ### jmx["com.boomi.container.services:type=Config", "ClusterProblem"]
 
 The ClusterProblem metric will only be set if jmx["com.boomi.container.services:type=Config", "Clustered"] is set to true. 
+
+| JMX Status | Output Value |
+|------------|--------------|
+| false      | 0            |
+| true       | 1            |
+
+
+### jmx["com.boomi.container.services:type=ResourceManager", "OutOfMemory"]
+
+If the runtime experienced an Out Of Memory error, the value will be 1. Otherwise, the value will be 0.
+
+| JMX Status | Output Value |
+|------------|--------------|
+| false      | 0            |
+| true       | 1            |
+
+
+### jmx["com.boomi.container.services:type=ContainerController", "HeadCloudlet"]
+
+If the runtime is the head cloudlet, the value will be 1. Otherwise, the value will be 0. This is the one metric where 0 or 1 is not a good or bad value. 
+It is just a value to indicate if the node is the head node.
 
 | JMX Status | Output Value |
 |------------|--------------|

@@ -142,4 +142,29 @@ public class JMXConnection {
         }
     }
 
+    public void getAtomEncounteredOOME()
+            throws ReflectionException, MalformedObjectNameException, AttributeNotFoundException,
+            MBeanException, IOException {
+        try {
+            Boolean lowMemoryStatus = (Boolean) getJmxObjectAttribute("com.boomi.container.services:type=ResourceManager", "OutOfMemory");
+            String OOMEStatusMetric = lowMemoryStatus ? "1" : "0";
+            printCollectdPutVal("ResourceManager", "OutOfMemory", OOMEStatusMetric);
+        } catch ( InstanceNotFoundException e) {
+            logger.warning("AtomEncounteredOOME InstanceNowFoundException: " + e);
+        }
+    }
+
+    public void getHeadNodeCloudlet()
+            throws ReflectionException, MalformedObjectNameException, AttributeNotFoundException,
+            MBeanException, IOException {
+        try {
+            Boolean headNodeCloudlet = (Boolean) getJmxObjectAttribute("com.boomi.container.services:type=ContainerController", "HeadCloudlet");
+            String headNodeCloudletMetric = headNodeCloudlet ? "1" : "0";
+            printCollectdPutVal("ContainerController", "HeadCloudlet", headNodeCloudletMetric);
+        } catch ( InstanceNotFoundException e) {
+            logger.warning("HeadNodeCloudlet InstanceNowFoundException: " + e);
+        }
+    }
+
+
 }

@@ -46,6 +46,8 @@ public class Main {
             connection.getRestarting();
             connection.getLowMemoryMode();
             connection.getClusterProblem();
+            connection.getAtomEncounteredOOME();
+            connection.getHeadNodeCloudlet();
             System.out.flush();
         } catch (Exception e) {
             logger.severe("Error connecting to JMX. Error Message: " + e);
